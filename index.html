@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Circle Calendar</title>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+      }
+
+      #svg {
+        max-width: 600px;
+      }
+    </style>
+    <script src="snap.svg-min.js"></script>
+  </head>
+  <body>
+
+    <svg id="svg" viewBox="0 0 600 600"></svg>
+
+    <script type="text/javascript">
+      var s = Snap('#svg');
+      var image = s.image('image.png', 50, 50, 500, 500);
+      var circle = s.circle(300, 300, 200).attr({
+        fill: '#FFFFFF'
+      });
+
+      image.attr({
+        mask: circle
+      });
+
+      for (var i = 0; i < 31; i++) {
+        s.text(290, 100, i).attr({
+          'font-size': 40,
+          fill: '#000000'
+        });
+      }
+
+    </script>
+  </body>
+</html>
