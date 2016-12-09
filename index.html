@@ -5,8 +5,8 @@
     <style>
       body, html {
         margin: 0;
-        padding: 0;
         min-height: 100%;
+        padding: 0;
       }
 
       #svg {
@@ -14,94 +14,101 @@
       }
     </style>
     <script src="snap.svg-min.js"></script>
-  </head>
+  <head>
   <body>
 
-    <svg id="svg" viewBox="0 0 500 500"></svg>
+    <div>
+      <svg id="svg" viewbox="0 0 600 600" style="background: #336699;"></svg>
+    </div>
 
     <script type="text/javascript">
-      var s = Snap('#svg');
-      var image = s.image('image.png', 0, 0, 500, 500);
-      var circle = s.circle(260, 250, 175).attr({
-        fill: '#FFFFFF'
-      });
-
-      image.attr({
-        mask: circle
-      });
-
-      var text = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-                  '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-                  '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'];
-
-      var text2 = ['M', 'T', 'O', 'T', 'F', 'L', 'S', 'M', 'T', 'O',
-                   'T', 'F', 'L', 'S', 'M', 'T', 'O', 'T', 'F', 'L',
-                   'S', 'M', 'T', 'O', 'T', 'F', 'L', 'S', 'M', 'T'];
-
-      var total_radians = Math.PI * 2 - 0;
-      var piece_radians = 1 * total_radians / text.length;
-      var nodes = createNodes(text.length, 187, 132);
-      var nodes2 = createNodes(text2.length, 162, 185);
-
-      for (var i = 0; i < nodes.length; i++) {
-        var fill = '#000000';
-        var fill2 = '#FFFFFF';
-
-        /*s.polygon(
-          20, // Pointy left
-          10, // Pointy top
-          10, // Right corner left
-          10, // Right corner top
-          200, // Left corner left
-          200 // Left corner top
-        ).attr({ fill: "red", stroke: "blue" });*/
-
-        if (i === 0) {
-          // Here we need to do some maths to calculate the right triangle stuff
-          s.polygon(
-            260 + ((nodes[i].x - 260) / 2),
-            250,
-            (nodes[i].x + 30),
-            (nodes[i].y - 25),
-            (nodes[i].x + 20),
-            (nodes[i].y + 15)
-          )
-          .attr({
-            fill: "white"
-          });
 
 
-          fill = '#fc1c68';
-          fill2 = '#fc1c68';
-        }
+      /**
+       * Functions
+       */
 
-        s.text(nodes[i].x, nodes[i].y, text[i]).attr({
-          'font-size': 14,
-          'fill': fill
-        });
-
-        s.text(nodes2[i].x, nodes2[i].y, text2[i]).attr({
-          'font-size': 14,
-          'fill': fill2
-        });
+      function getDaysInMonth(m, y) {
+        return /8|3|5|10/.test(--m)?30:m==1?(!(y%4)&&y%100)||!(y%400)?29:28:31;
       }
 
       function createNodes (numNodes, radius, where) {
         var nodes = [];
         var width = (radius * 2) + where;
-        //var height = (radius * 2) + 0;
-        var angle;
-        var x;
-        var y;
-        var i;
+        var angle, x, y, i;
         for (i = 0; i < numNodes; i++) {
-          angle = (i / (numNodes/2)) * Math.PI; // Calculate the angle at which the element will be placed. // For a semicircle, we would use (i / numNodes) * Math.PI.
-          x = (radius * Math.cos(angle)) + (width/2); // Calculate the x position of the element.
-          y = (radius * Math.sin(angle)) + (width/2); // Calculate the y position of the element.
-          nodes.push({'id': i, 'x': x, 'y': y});
+          angle = (i / (numNodes / 2)) * Math.PI;
+          x = (radius * Math.cos(angle)) + (width / 2);
+          y = (radius * Math.sin(angle)) + (width / 2) + 15;
+
+          nodes.push({
+            x: x,
+            y: y
+          });
         }
+
         return nodes;
       }
+
+      function animatePath (path, time) {
+
+        console.log(path);
+
+        var length = path.getTotalLength();
+        path.style.transition = path.style.WebkitTransition = 'none';
+        path.style.strokeDasharray = length + ' ' + length;
+        path.style.strokeDashoffset = length;
+
+        path.getBoundingClientRect();
+
+        path.style.transition = path.style.WebkitTransition = 'stroke-dashoffset ' + time + 's ease-in-out';
+        path.style.strokeDashoffset = '0';
+      }
+
+      /**
+       * End of functions
+       */
+
+
+
+      var snap = Snap('#svg');
+
+      // Create the background and circle
+      var imageBackground = snap.image('image.png', 0, 0, 600, 600);
+      var calendarCircle = snap.circle(300, 300, 200).attr({
+        fill: '#FFFFFF'
+      });
+
+      // Mask background
+      //imageBackground.attr({
+      //  mask: calendarCircle
+      //});
+
+      // Some date assigning
+      var date = new Date();
+      var numDatesThisMonth = getDaysInMonth(date.getMonth() + 1, date.getFullYear());
+
+      var numberCircleNodes = createNodes(numDatesThisMonth, 220, 140);
+
+      for (var i = 0; i < numDatesThisMonth; i++) {
+        snap.text(numberCircleNodes[i].x, numberCircleNodes[i].y, (i + 1)).attr({
+          'font-size': 14,
+          'fill': '#000000'
+        });
+      }
+
+      var simplePath = snap.path("M0 0S50 25 100 100").attr({
+        stroke: 'red',
+        'stroke-width': 2,
+        fill: 'transparent'
+      });
+
+      console.log(simplePath.node);
+      var path = simplePath.node;
+
+      animatePath(path, 3);
+
     </script>
+
   </body>
 </html>

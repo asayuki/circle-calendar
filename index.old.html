@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Circle Calendar</title>
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        min-height: 100%;
+      }
+
+      #svg {
+        max-width: 600px;
+      }
+    </style>
+    <script src="snap.svg-min.js"></script>
+  </head>
+  <body>
+
+    <svg id="svg" viewBox="0 0 500 500" style="background: green;"></svg>
+
+    <script type="text/javascript">
+      var s = Snap('#svg');
+      var image = s.image('image.png', 0, 0, 500, 500);
+      var circle = s.circle(260, 250, 175).attr({
+        fill: '#FFFFFF'
+      });
+
+      image.attr({
+        mask: circle
+      });
+
+      var text = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+                  '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                  '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'];
+
+      var text2 = ['M', 'T', 'O', 'T', 'F', 'L', 'S', 'M', 'T', 'O',
+                   'T', 'F', 'L', 'S', 'M', 'T', 'O', 'T', 'F', 'L',
+                   'S', 'M', 'T', 'O', 'T', 'F', 'L', 'S', 'M', 'T'];
+
+      var total_radians = Math.PI * 2 - 0;
+      var piece_radians = 1 * total_radians / text.length;
+      var nodes = createNodes(text.length, 187, 132);
+      var nodes2 = createNodes(text2.length, 162, 185);
+
+      for (var i = 0; i < nodes.length; i++) {
+        var fill = '#000000';
+        var fill2 = '#FFFFFF';
+
+        /*s.polygon(
+          20, // Pointy left
+          10, // Pointy top
+          10, // Right corner left
+          10, // Right corner top
+          200, // Left corner left
+          200 // Left corner top
+        ).attr({ fill: "red", stroke: "blue" });*/
+
+        if (i === 26) {
+          // Here we need to do some maths to calculate the right triangle stuff
+          s.polygon(
+            260 + ((nodes[i].x - 260) / 2),
+            250,
+            (nodes[i].x + 30),
+            (nodes[i].y - 25),
+            (nodes[i].x + 20),
+            (nodes[i].y + 15)
+          )
+          .attr({
+            fill: "white"
+          });
+
+
+          fill = '#fc1c68';
+          fill2 = '#fc1c68';
+        }
+
+        s.text(nodes[i].x, nodes[i].y, text[i]).attr({
+          'font-size': 14,
+          'fill': fill
+        });
+
+        s.text(nodes2[i].x, nodes2[i].y, text2[i]).attr({
+          'font-size': 14,
+          'fill': fill2
+        });
+      }
+
+      function createNodes (numNodes, radius, where) {
+        var nodes = [];
+        var width = (radius * 2) + where;
+        //var height = (radius * 2) + 0;
+        var angle;
+        var x;
+        var y;
+        var i;
+        for (i = 0; i < numNodes; i++) {
+          angle = (i / (numNodes/2)) * Math.PI; // Calculate the angle at which the element will be placed. // For a semicircle, we would use (i / numNodes) * Math.PI.
+          x = (radius * Math.cos(angle)) + (width/2); // Calculate the x position of the element.
+          y = (radius * Math.sin(angle)) + (width/2); // Calculate the y position of the element.
+          nodes.push({'id': i, 'x': x, 'y': y});
+        }
+        return nodes;
+      }
+    </script>
+  </body>
+</html>
