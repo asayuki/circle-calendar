@@ -32,14 +32,14 @@
         return /8|3|5|10/.test(--m)?30:m==1?(!(y%4)&&y%100)||!(y%400)?29:28:31;
       }
 
-      function createNodes (numNodes, radius, where) {
+      function createTextNodes (numNodes, radius, top, left) {
         var nodes = [];
-        var width = (radius * 2) + where;
+        var width = (radius * 2);
         var angle, x, y, i;
         for (i = 0; i < numNodes; i++) {
           angle = (i / (numNodes / 2)) * Math.PI;
-          x = (radius * Math.cos(angle)) + (width / 2);
-          y = (radius * Math.sin(angle)) + (width / 2) + 15;
+          x = ((radius * Math.cos(angle)) + (width / 2)) + left;
+          y = ((radius * Math.sin(angle)) + (width / 2) + 15) + top;
 
           nodes.push({
             x: x,
@@ -50,10 +50,27 @@
         return nodes;
       }
 
+      function createLineNodes (numNodes, skip, end, radius, top, left) {
+        var line = [];
+        var width = (radius * 2);
+        var angle, x, y, i;
+        for (i = 0; i < numNodes; i++) {
+          angle = (i / (numNodes / 2)) * Math.PI;
+          x = ((radius * Math.cos(angle)) + (width / 2)) + left;
+          y = ((radius * Math.sin(angle)) + (width / 2) + 15) + top;
+
+          if (i > skip && i < end) {
+            line.push({
+              x: x,
+              y: y
+            });
+          }
+        }
+
+        return line;
+      }
+
       function animatePath (path, time) {
-
-        console.log(path);
-
         var length = path.getTotalLength();
         path.style.transition = path.style.WebkitTransition = 'none';
         path.style.strokeDasharray = length + ' ' + length;
@@ -69,8 +86,7 @@
        * End of functions
        */
 
-
-
+      var weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
       var snap = Snap('#svg');
 
       // Create the background and circle
@@ -80,22 +96,45 @@
       });
 
       // Mask background
-      //imageBackground.attr({
-      //  mask: calendarCircle
-      //});
+      imageBackground.attr({
+        mask: calendarCircle
+      });
 
       // Some date assigning
       var date = new Date();
       var numDatesThisMonth = getDaysInMonth(date.getMonth() + 1, date.getFullYear());
 
-      var numberCircleNodes = createNodes(numDatesThisMonth, 220, 140);
+      // Create some nodes
+      var numberCircleNodes = createTextNodes(numDatesThisMonth, 200, 100, 100);
+      var dayCircleNodes = createTextNodes(numDatesThisMonth, 200, 0, 50);
+      var eventOne = createLineNodes(numDatesThisMonth, 5, 10, 230, 120);
 
-      for (var i = 0; i < numDatesThisMonth; i++) {
-        snap.text(numberCircleNodes[i].x, numberCircleNodes[i].y, (i + 1)).attr({
-          'font-size': 14,
-          'fill': '#000000'
-        });
-      }
+      var weekDay = null;
+      var item = null;
+
+      //for (var i = 0; i < numDatesThisMonth; i++) {
+      //  weekDay = new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + (i+1));
+      //  weekDay = weekDay.getDay();
+      //  item = snap.text(numberCircleNodes[i].x, numberCircleNodes[i].y, (i + 1)).attr({
+      //    'font-size': 14,
+      //    'fill': '#000000'
+      //  });
+      //  item.attr({
+      //    dx: '-' + (item.node.clientWidth / 2),
+      //    dy: '-' + (item.node.clientHeight / 2)
+      //  });
+      //  item = snap.text(dayCircleNodes[i].x, dayCircleNodes[i].y, weekDays[weekDay]).attr({
+      //    'font-size': 14,
+      //    'fill': '#000000'
+      //  });
+      //  weekDay = null;
+      //}
+      //for (var i = 0; i < eventOne.length; i++) {
+      //  snap.text(eventOne[i].x, eventOne[i].y, weekDays[i]).attr({
+      //    'font-size': 14,
+      //    'fill': '#000000'
+      //  });
+      //}
 
       var simplePath = snap.path("M0 0S50 25 100 100").attr({
         stroke: 'red',
