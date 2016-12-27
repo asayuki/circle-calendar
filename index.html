@@ -32,22 +32,63 @@
         return /8|3|5|10/.test(--m)?30:m==1?(!(y%4)&&y%100)||!(y%400)?29:28:31;
       }
 
-      function createTextNodes (numNodes, radius, top, left) {
-        var nodes = [];
-        var width = (radius * 2);
-        var angle, x, y, i;
-        for (i = 0; i < numNodes; i++) {
-          angle = (i / (numNodes / 2)) * Math.PI;
-          x = ((radius * Math.cos(angle)) + (width / 2)) + left;
-          y = ((radius * Math.sin(angle)) + (width / 2) + 15) + top;
-
-          nodes.push({
-            x: x,
-            y: y
+      function createTextCircle (centerX, centerY, radius, texts) {
+        var textNum = texts.length;
+        for (i = 0; i < textNum; i++) {
+          angle = ((i / (textNum / 2))) * Math.PI ;
+          item = snap.text(
+            centerX + (radius * Math.cos(angle)),
+            centerY + (radius * Math.sin(angle)),
+            texts[i]
+          ).attr({
+            'font-size': 14,
+            'fill': '#000000'
+          });
+          item.attr({
+            dx: '-' + (item.node.clientWidth / 2)
           });
         }
+      }
 
-        return nodes;
+      function createLineCircle (centerX, centerY, radius, num, skip, end) {
+
+        var sayWhat = [];
+
+        console.log(num);
+        console.log(skip);
+        console.log(end);
+
+        for (var i = 0; i < num; i++) {
+
+          if (i >= skip && i <= end) {
+            console.log('bajs');
+          }
+
+          if (i >= skip && i <= end) {
+            console.log(i);
+            sayWhat.push({
+              x: centerX + (radius * Math.cos(angle)),
+              y: centerY + (radius * Math.sin(angle)),
+            });
+          }
+        }
+
+        console.log('M', sayWhat[0].x, sayWhat[0].y, 'A', radius, radius, 0, 1, 0, sayWhat[sayWhat.length-1].x, sayWhat[sayWhat.length-1].y);
+        //console.log(test);
+        console.log(sayWhat);
+        console.log(sayWhat.length);
+
+        snap.path(
+          'M' + sayWhat[0].x + ' ' + sayWhat[0].y
+          + 'A' + radius + ' ' + radius + ' 0 1 0 ' + sayWhat[sayWhat.length-1].x + ' ' + sayWhat[sayWhat.length-1].y
+        ).attr({
+          stroke: 'red',
+          'stroke-width': 2,
+          fill: 'transparent'
+        });
+
+        console.log(sayWhat);
+
       }
 
       function createLineNodes (numNodes, skip, end, radius, top, left) {
@@ -59,7 +100,7 @@
           x = ((radius * Math.cos(angle)) + (width / 2)) + left;
           y = ((radius * Math.sin(angle)) + (width / 2) + 15) + top;
 
-          if (i > skip && i < end) {
+          if (i => skip && i <= end) {
             line.push({
               x: x,
               y: y
@@ -104,31 +145,51 @@
       var date = new Date();
       var numDatesThisMonth = getDaysInMonth(date.getMonth() + 1, date.getFullYear());
 
+      // Get this dynamicly instead
+      var daysInMonth = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'];
+      var currentMonth = 11;
+      var currentYear = 2016;
+
       // Create some nodes
-      var numberCircleNodes = createTextNodes(numDatesThisMonth, 200, 100, 100);
-      var dayCircleNodes = createTextNodes(numDatesThisMonth, 200, 0, 50);
-      var eventOne = createLineNodes(numDatesThisMonth, 5, 10, 230, 120);
+      //var numberCircleNodes = createTextNodes(numDatesThisMonth, 200, 100, 100);
+      //var numberCircleNodes = createTextCircle(300, 300, 200, 31);
+      //var dayCircleNodes = createTextNodes(numDatesThisMonth, 200, 0, 50);
+      //var eventOne = createLineNodes(numDatesThisMonth, 0, numDatesThisMonth, 220, 70, 80);
+
+
+      // Create numDates
+      createTextCircle(300, 300, 200, daysInMonth);
+      // Create textDates
+      var arr = [];
+      for (var i = 0; i < daysInMonth.length; i++) {
+        var tmpDate = new Date(currentYear + '-' + (currentMonth + 1) + '-' + (daysInMonth[i]));
+        arr.push(weekDays[tmpDate.getDay()]);
+      }
+
+      createTextCircle(300, 300, 220, arr);
 
       var weekDay = null;
       var item = null;
 
-      //for (var i = 0; i < numDatesThisMonth; i++) {
-      //  weekDay = new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + (i+1));
-      //  weekDay = weekDay.getDay();
-      //  item = snap.text(numberCircleNodes[i].x, numberCircleNodes[i].y, (i + 1)).attr({
-      //    'font-size': 14,
-      //    'fill': '#000000'
-      //  });
-      //  item.attr({
-      //    dx: '-' + (item.node.clientWidth / 2),
-      //    dy: '-' + (item.node.clientHeight / 2)
-      //  });
+      createLineCircle(300, 300, 240, 31, 0, 5);
+
+      /*for (var i = 0; i < numDatesThisMonth; i++) {
+        weekDay = new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + (i+1));
+        weekDay = weekDay.getDay();
+        item = snap.text(numberCircleNodes[i].x, numberCircleNodes[i].y, (i + 1)).attr({
+          'font-size': 14,
+          'fill': '#000000'
+        });
+        item.attr({
+          dx: '-' + (item.node.clientWidth / 2),
+          dy: '-' + (item.node.clientHeight / 2)
+        });
       //  item = snap.text(dayCircleNodes[i].x, dayCircleNodes[i].y, weekDays[weekDay]).attr({
       //    'font-size': 14,
       //    'fill': '#000000'
       //  });
       //  weekDay = null;
-      //}
+      }
       //for (var i = 0; i < eventOne.length; i++) {
       //  snap.text(eventOne[i].x, eventOne[i].y, weekDays[i]).attr({
       //    'font-size': 14,
@@ -136,15 +197,59 @@
       //  });
       //}
 
-      var simplePath = snap.path("M0 0S50 25 100 100").attr({
+      /*var ssimplePath = snap.path("M0 0S50 25 100 100S100 50 200 100").attr({
+        stroke: 'red',
+        'stroke-width': 2,
+        fill: 'transparent'
+      });*/
+
+      //var meep = '';
+      //for (var i = 0; i < eventOne.length; i++) {
+      //  meep += parseInt(eventOne[i].x) + ' ' + parseInt(eventOne[i].y) + ' ';
+      //}
+      //console.log(meep);
+
+      var simplePath = snap.path(
+        "M"
+        + "520 305 "
+        + "515 349 "
+        + "502 391 "
+        + "480 430 "
+        + "451 464 "
+        + "416 491 "
+        + "376 511 "
+        + "333 522 "
+        + "288 524 "
+        + "244 517 "
+        + "203 502 "
+        + "165 478 "
+        + "133 448 "
+        + "107 411 "
+        + "90 370 "
+        + "81 327 "
+        + "81 282 "
+        + "90 239 "
+        + "107 198 "
+        + "133 161 "
+        + "165 131 "
+        + "203 107 "
+        + "244 92 "
+        + "288 85 "
+        + "333 87 "
+        + "376 98 "
+        + "416 118 "
+        + "451 145 "
+        + "480 179 "
+        + "502 218 "
+        + "515 260"
+      ).attr({
         stroke: 'red',
         'stroke-width': 2,
         fill: 'transparent'
       });
 
-      console.log(simplePath.node);
+      //console.log(simplePath.node);
       var path = simplePath.node;
-
       animatePath(path, 3);
 
     </script>
