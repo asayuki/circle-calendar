@@ -18,7 +18,7 @@
   <body>
 
     <div>
-      <svg id="svg" viewbox="0 0 600 600" style="background: #336699;"></svg>
+      <svg id="svg" viewbox="0 0 600 600" style=""></svg>
     </div>
 
     <script type="text/javascript">
@@ -32,10 +32,23 @@
         return /8|3|5|10/.test(--m)?30:m==1?(!(y%4)&&y%100)||!(y%400)?29:28:31;
       }
 
+      /*function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+        var angleInRadians = (angleInDegrees) * Math.PI / 180.0;
+
+        return {
+          x: centerX + (radius * Math.cos(angleInRadians)),
+          y: centerY + (radius * Math.sin(angleInRadians))
+        };
+      }*/
+
+      /**
+       * End of functions
+       */
+
       function createTextCircle (centerX, centerY, radius, texts) {
         var textNum = texts.length;
         for (i = 0; i < textNum; i++) {
-          angle = ((i / (textNum / 2))) * Math.PI ;
+          angle = ((i / (textNum / 2))) * Math.PI;
           item = snap.text(
             centerX + (radius * Math.cos(angle)),
             centerY + (radius * Math.sin(angle)),
@@ -45,27 +58,91 @@
             'fill': '#000000'
           });
           item.attr({
-            dx: '-' + (item.node.clientWidth / 2)
+            dx: '-' + (item.node.clientWidth / 2),
+            dy: '' + (item.node.clientHeight / 3)
+          });
+
+          snap.circle(centerX + (radius * Math.cos(angle)), centerY + (radius * Math.sin(angle)), 1).attr({
+            fill: '#FF0000'
           });
         }
       }
 
-      function createLineCircle (centerX, centerY, radius, num, skip, end) {
+      function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+        var angleInRadians = (angleInDegrees) * Math.PI / 180.0;
+        return {
+          x: centerX + (radius * Math.cos(angleInRadians)),
+          y: centerY + (radius * Math.sin(angleInRadians))
+        };
+      }
 
-        var sayWhat = [];
+      function createLineCircle (x, y, radius, startAngle, endAngle){
 
-        console.log(num);
-        console.log(skip);
-        console.log(end);
-
-        for (var i = 0; i < num; i++) {
-
-          if (i >= skip && i <= end) {
-            console.log('bajs');
+          var endAngleOriginal = endAngle;
+          if(endAngleOriginal - startAngle === 360){
+              endAngle = 359;
           }
 
+          var start = polarToCartesian(x, y, radius, endAngle);
+          var end = polarToCartesian(x, y, radius, startAngle);
+
+          var arcSweep = endAngle - startAngle <= 180 ? "0" : "1";
+
+          if(endAngleOriginal - startAngle === 360){
+              var d = [
+                    "M", start.x, start.y,
+                    "A", radius, radius, 0, arcSweep, 0, end.x, end.y, "z"
+              ].join(" ");
+          }
+          else{
+            var d = [
+                "M", start.x, start.y,
+                "A", radius, radius, 0, arcSweep, 0, end.x, end.y
+            ].join(" ");
+          }
+
+          var line = snap.path(
+            //'M' + parseInt(sayWhat[0].x) + ' ' + parseInt(sayWhat[0].y)
+            //+ 'A' + radius + ' ' + radius + ' 0 ' + tehLul + ' 0 ' + parseInt(sayWhat[sayWhat.length-1].x) + ' ' + parseInt(sayWhat[sayWhat.length-1].y)
+            d
+          ).attr({
+            stroke: 'red',
+            'stroke-width': 2,
+            fill: 'none'
+          });
+
+          return line;
+      }
+
+      /*function createLineCircle (centerX, centerY, radius, num, skip, end) {
+
+        console.log(centerX);
+        console.log(centerY);
+        console.log(radius);
+
+        var one = 360 / num;
+
+        var start = polarToCartesian(centerX, centerY, radius, 0);
+        var ending = polarToCartesian(centerX, centerY, radius, (one*end));
+
+        console.log(one*end);
+        console.log(one*skip);
+
+        var largeArcFlag = (one*end) - (one*skip) <= 180 ? "0" : "1";
+
+        var d = [
+            "M", start.x, start.y,
+            "A", radius, radius, 0, largeArcFlag, 0, ending.x, ending.y
+        ].join(" ");
+
+        console.log(d);
+
+        /*var sayWhat = [];
+
+        for (var i = 0; i < num; i++) {
           if (i >= skip && i <= end) {
-            console.log(i);
+            var angle = ((i / (num / 2))) * Math.PI;
+
             sayWhat.push({
               x: centerX + (radius * Math.cos(angle)),
               y: centerY + (radius * Math.sin(angle)),
@@ -73,49 +150,34 @@
           }
         }
 
-        console.log('M', sayWhat[0].x, sayWhat[0].y, 'A', radius, radius, 0, 1, 0, sayWhat[sayWhat.length-1].x, sayWhat[sayWhat.length-1].y);
+        console.log('M', parseInt(sayWhat[0].x), parseInt(sayWhat[0].y), 'A', radius, radius, 0, 1, 0, parseInt(sayWhat[sayWhat.length-1].x), parseInt(sayWhat[sayWhat.length-1].y));*/
         //console.log(test);
-        console.log(sayWhat);
-        console.log(sayWhat.length);
+        //console.log(sayWhat);
+        //console.log(sayWhat.length);
 
-        snap.path(
-          'M' + sayWhat[0].x + ' ' + sayWhat[0].y
-          + 'A' + radius + ' ' + radius + ' 0 1 0 ' + sayWhat[sayWhat.length-1].x + ' ' + sayWhat[sayWhat.length-1].y
+        /*var xDiff = sayWhat[0].x - sayWhat[sayWhat.length-1].x;
+        var yDiff = sayWhat[0].y - sayWhat[sayWhat.length-1].y;
+        var tehLul = 1;//(Math.atan2(yDiff, xDiff) * 180.0 / Math.PI <= 180) ? '0' : '1';*/
+
+        /*snap.path(
+          //'M' + parseInt(sayWhat[0].x) + ' ' + parseInt(sayWhat[0].y)
+          //+ 'A' + radius + ' ' + radius + ' 0 ' + tehLul + ' 0 ' + parseInt(sayWhat[sayWhat.length-1].x) + ' ' + parseInt(sayWhat[sayWhat.length-1].y)
+          d
         ).attr({
           stroke: 'red',
           'stroke-width': 2,
-          fill: 'transparent'
+          fill: 'none'
         });
 
-        console.log(sayWhat);
+        //console.log(sayWhat);
 
-      }
+      }*/
 
-      function createLineNodes (numNodes, skip, end, radius, top, left) {
-        var line = [];
-        var width = (radius * 2);
-        var angle, x, y, i;
-        for (i = 0; i < numNodes; i++) {
-          angle = (i / (numNodes / 2)) * Math.PI;
-          x = ((radius * Math.cos(angle)) + (width / 2)) + left;
-          y = ((radius * Math.sin(angle)) + (width / 2) + 15) + top;
-
-          if (i => skip && i <= end) {
-            line.push({
-              x: x,
-              y: y
-            });
-          }
-        }
-
-        return line;
-      }
-
-      function animatePath (path, time) {
+      function animatePath (path, time, reverse) {
         var length = path.getTotalLength();
         path.style.transition = path.style.WebkitTransition = 'none';
         path.style.strokeDasharray = length + ' ' + length;
-        path.style.strokeDashoffset = length;
+        path.style.strokeDashoffset = (reverse) ? '-' + length : length;
 
         path.getBoundingClientRect();
 
@@ -156,9 +218,8 @@
       //var dayCircleNodes = createTextNodes(numDatesThisMonth, 200, 0, 50);
       //var eventOne = createLineNodes(numDatesThisMonth, 0, numDatesThisMonth, 220, 70, 80);
 
-
       // Create numDates
-      createTextCircle(300, 300, 200, daysInMonth);
+      createTextCircle(300, 300, 215, daysInMonth);
       // Create textDates
       var arr = [];
       for (var i = 0; i < daysInMonth.length; i++) {
@@ -166,50 +227,31 @@
         arr.push(weekDays[tmpDate.getDay()]);
       }
 
-      createTextCircle(300, 300, 220, arr);
+      createTextCircle(300, 300, 185, arr);
 
       var weekDay = null;
       var item = null;
 
-      createLineCircle(300, 300, 240, 31, 0, 5);
+      //createLineCircle(300, 300, 220, 31, 0, 17);
+      var hoj = createLineCircle(300, 300, 230, ((360 / daysInMonth.length) * 0), ((360 / daysInMonth.length) * 5));
+      var haj = createLineCircle(300, 300, 230, ((360 / daysInMonth.length) * 8), ((360 / daysInMonth.length) * 17));
+      var hij = createLineCircle(300, 300, 240, ((360 / daysInMonth.length) * 0), ((360 / daysInMonth.length) * 17));
+      var hej = createLineCircle(300, 300, 250, ((360 / daysInMonth.length) * 0), ((360 / daysInMonth.length) * 17));
 
-      /*for (var i = 0; i < numDatesThisMonth; i++) {
-        weekDay = new Date(date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + (i+1));
-        weekDay = weekDay.getDay();
-        item = snap.text(numberCircleNodes[i].x, numberCircleNodes[i].y, (i + 1)).attr({
-          'font-size': 14,
-          'fill': '#000000'
-        });
-        item.attr({
-          dx: '-' + (item.node.clientWidth / 2),
-          dy: '-' + (item.node.clientHeight / 2)
-        });
-      //  item = snap.text(dayCircleNodes[i].x, dayCircleNodes[i].y, weekDays[weekDay]).attr({
-      //    'font-size': 14,
-      //    'fill': '#000000'
-      //  });
-      //  weekDay = null;
-      }
-      //for (var i = 0; i < eventOne.length; i++) {
-      //  snap.text(eventOne[i].x, eventOne[i].y, weekDays[i]).attr({
-      //    'font-size': 14,
-      //    'fill': '#000000'
-      //  });
-      //}
+      animatePath(hej.node, 3, true);
+      animatePath(haj.node, 3, true);
+      animatePath(hoj.node, 3, true);
+      animatePath(hij.node, 3, true);
 
-      /*var ssimplePath = snap.path("M0 0S50 25 100 100S100 50 200 100").attr({
-        stroke: 'red',
+      /*snap.path(
+        'M 530 300 A 240 240 0 0 0 530 200'
+      ).attr({
+        stroke: 'blue',
         'stroke-width': 2,
         fill: 'transparent'
       });*/
 
-      //var meep = '';
-      //for (var i = 0; i < eventOne.length; i++) {
-      //  meep += parseInt(eventOne[i].x) + ' ' + parseInt(eventOne[i].y) + ' ';
-      //}
-      //console.log(meep);
-
-      var simplePath = snap.path(
+      /*var simplePath = snap.path(
         "M"
         + "520 305 "
         + "515 349 "
@@ -250,7 +292,7 @@
 
       //console.log(simplePath.node);
       var path = simplePath.node;
-      animatePath(path, 3);
+      animatePath(path, 3);*/
 
     </script>
 
