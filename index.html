@@ -13,7 +13,7 @@
         max-width: 600px;
       }
     </style>
-    <script src="snap.svg-min.js"></script>
+    <script src="https://cdn.rawgit.com/adobe-webplatform/Snap.svg/master/dist/snap.svg.js"></script>
   <head>
   <body>
 
@@ -49,21 +49,26 @@
         var textNum = texts.length;
         for (i = 0; i < textNum; i++) {
           angle = ((i / (textNum / 2))) * Math.PI;
+
+          //console.log(((360 / texts.length) * i) + 45);
+
+          var x = centerX + (radius * Math.cos(angle));
+          var y = centerY + (radius * Math.sin(angle));
+          var matrix = new Snap.Matrix();
+          matrix.rotate(((360 / texts.length) * i) + 90, x, y);
+
           item = snap.text(
-            centerX + (radius * Math.cos(angle)),
-            centerY + (radius * Math.sin(angle)),
+            x,
+            y,
             texts[i]
           ).attr({
             'font-size': 14,
-            'fill': '#000000'
+            'fill': '#000000',
+            transform: matrix
           });
           item.attr({
             dx: '-' + (item.node.clientWidth / 2),
             dy: '' + (item.node.clientHeight / 3)
-          });
-
-          snap.circle(centerX + (radius * Math.cos(angle)), centerY + (radius * Math.sin(angle)), 1).attr({
-            fill: '#FF0000'
           });
         }
       }
@@ -101,13 +106,9 @@
             ].join(" ");
           }
 
-          var line = snap.path(
-            //'M' + parseInt(sayWhat[0].x) + ' ' + parseInt(sayWhat[0].y)
-            //+ 'A' + radius + ' ' + radius + ' 0 ' + tehLul + ' 0 ' + parseInt(sayWhat[sayWhat.length-1].x) + ' ' + parseInt(sayWhat[sayWhat.length-1].y)
-            d
-          ).attr({
+          var line = snap.path(d).attr({
             stroke: 'red',
-            'stroke-width': 2,
+            'stroke-width': 3,
             fill: 'none'
           });
 
