@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Circle Calendar</title>
+    <style>
+      body,html {
+        margin: 0;
+        padding: 0;
+        font-family: Roboto;
+      }
+      #svg {
+        max-width: 600px;
+      }
+    </style>
+    <script src="https://cdn.rawgit.com/adobe-webplatform/Snap.svg/master/dist/snap.svg.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  </head>
+  <body>
+    <svg id="svg" viewbox="0 0 600 600"></svg>
+    <script src="../cc.js"></script>
+    <script>
+      var cc = new Cc('#svg', {});
+    </script>
+  </body>
+</html>
